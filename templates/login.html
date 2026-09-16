@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Login to Book Reading Community Platform">
+  <title>Login - Book Reading Community</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-brand animate-fade-up">
+      <div class="brand-content">
+        <div class="brand-logo">&#128218;</div>
+        <h1>Book Reading Community</h1>
+        <h2>Keep every reading habit in motion</h2>
+        <ul class="brand-features">
+          <li>Discover books and reading lists</li>
+          <li>Write and browse reviews</li>
+          <li>Create shared reading groups</li>
+          <li>Track book progress</li>
+          <li>Use AI reading support</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="auth-form-panel animate-fade-up" style="animation-delay:0.15s;">
+      <div class="form-header">
+        <h2>Welcome Back</h2>
+        <p>Sign in to access your reading dashboard</p>
+      </div>
+
+      <form class="auth-form" id="loginForm">
+        <div class="form-group">
+          <label for="loginEmail">Username or Email</label>
+          <input type="text" id="loginEmail" class="form-control" placeholder="Enter your username or email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <div class="password-field">
+            <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" required minlength="6">
+            <button type="button" class="toggle-pass" onclick="togglePasswordVisibility('loginPassword', this)">Show</button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="padding:13px;font-size:1rem;">Sign In</button>
+
+        <div class="form-footer">
+          <p>Don't have an account? <a href="{{ url_for('register_page') }}">Register Now</a></p>
+          <p style="margin-top:0.5rem;"><a href="{{ url_for('home') }}" style="font-weight:400;">Back to Home</a></p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    window.BOOK_PLATFORM_ROUTES = {
+      home: "{{ url_for('home') }}",
+      login: "{{ url_for('login_page') }}",
+      register: "{{ url_for('register_page') }}",
+      dashboard: "{{ url_for('dashboard_page') }}"
+    };
+  </script>
+  <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/alerts.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+  <script>
+    const user = Utils.getCurrentUser();
+    if (user) window.location.href = window.BOOK_PLATFORM_ROUTES.dashboard;
+    Utils.loadDarkMode();
+    initLoginPage();
+  </script>
+</body>
+</html>

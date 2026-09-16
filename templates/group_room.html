@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reading Room - Book Reading Community</title>
+  <style>
+    :root {
+      --ink: #17231f;
+      --muted: #64736e;
+      --line: #dce6e1;
+      --paper: #ffffff;
+      --soft: #f6f9f7;
+      --teal: #1f6b5a;
+      --teal-dark: #155344;
+      --navy: #0b1728;
+      --gold: #c9a84c;
+      --shadow: 0 18px 44px rgba(23, 35, 31, 0.12);
+      --shadow-strong: 0 28px 70px rgba(11, 23, 40, 0.24);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.96), rgba(244,248,246,0.94)),
+        linear-gradient(135deg, #edf5f1 0%, #f8f4e6 48%, #eef3f9 100%);
+      color: var(--ink);
+      font-family: Inter, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    button, input, textarea, select { font: inherit; }
+    button,
+    .top-link {
+      align-items: center;
+      background: var(--teal);
+      border: 0;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      display: inline-flex;
+      font-weight: 800;
+      justify-content: center;
+      min-height: 40px;
+      padding: 9px 13px;
+      transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    button:hover,
+    .top-link:hover {
+      background: var(--teal-dark);
+      box-shadow: 0 12px 24px rgba(31, 107, 90, 0.2);
+      transform: translateY(-1px);
+    }
+    button.secondary,
+    .top-link.secondary {
+      background: #eef4f1;
+      color: #27423a;
+      box-shadow: none;
+    }
+    button.secondary:hover,
+    .top-link.secondary:hover { background: #dcebe4; box-shadow: none; }
+    button:disabled { cursor: not-allowed; opacity: 0.55; transform: none; }
+    a { color: inherit; text-decoration: none; }
+
+    .room-shell {
+      display: grid;
+      gap: 18px;
+      grid-template-rows: auto 1fr;
+      min-height: 100vh;
+      padding: 18px;
+    }
+
+    .topbar {
+      align-items: center;
+      animation: fadeIn 0.36s ease both;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 10px 26px rgba(23, 35, 31, 0.08);
+      display: flex;
+      gap: 14px;
+      justify-content: space-between;
+      padding: 14px 16px;
+    }
+    .title-block {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+    .eyebrow {
+      color: var(--teal);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3 { letter-spacing: 0; margin: 0; }
+    h1 {
+      color: var(--ink);
+      font-size: clamp(1.25rem, 3vw, 1.9rem);
+      font-weight: 900;
+      line-height: 1.15;
+      overflow-wrap: anywhere;
+    }
+    .meta {
+      color: var(--muted);
+      font-size: 0.9rem;
+      overflow-wrap: anywhere;
+    }
+    .top-actions {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .room-grid {
+      animation: riseIn 0.42s ease 0.06s both;
+      background:
+        radial-gradient(circle at 18% 0%, rgba(201, 168, 76, 0.24), transparent 34%),
+        linear-gradient(135deg, #0b1728 0%, #14243a 58%, #183f37 100%);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 8px;
+      box-shadow: var(--shadow-strong);
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      min-height: 0;
+      padding: 14px;
+    }
+
+    .reader-pane,
+    .collab-pane {
+      background: rgba(255,255,255,0.98);
+      border: 1px solid rgba(255,255,255,0.74);
+      border-radius: 8px;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .reader-pane {
+      display: grid;
+      grid-column: span 3;
+      grid-template-rows: auto auto 1fr;
+      min-height: calc(100vh - 142px);
+    }
+    .reader-toolbar {
+      align-items: center;
+      border-bottom: 1px solid #e5ede8;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      padding: 14px;
+    }
+    .page-tools {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .badge {
+      background: #e9f3ef;
+      border-radius: 999px;
+      color: #1d5d4f;
+      display: inline-flex;
+      font-size: 0.78rem;
+      font-weight: 900;
+      padding: 8px 11px;
+      white-space: nowrap;
+    }
+    .page-jump {
+      align-items: center;
+      display: inline-flex;
+      gap: 6px;
+    }
+    .page-jump input {
+      background: #fbfcfb;
+      border: 1px solid #cfdcd5;
+      border-radius: 8px;
+      height: 40px;
+      max-width: 76px;
+      outline: none;
+      padding: 8px;
+      text-align: center;
+    }
+    .page-jump input:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 4px rgba(31, 107, 90, 0.12);
+    }
+    .progress-track {
+      background: #dfe9e4;
+      height: 8px;
+      overflow: hidden;
+    }
+    .progress-track span {
+      background: linear-gradient(90deg, var(--teal), var(--gold));
+      display: block;
+      height: 100%;
+      transition: width 0.3s ease;
+      width: var(--progress);
+    }
+    .book-frame {
+      background: #f8faf8;
+      border: 0;
+      height: 100%;
+      min-height: 620px;
+      width: 100%;
+    }
+    .local-page {
+      background:
+        linear-gradient(90deg, rgba(201,168,76,0.14), transparent 18%),
+        #fffdf7;
+      color: #27332f;
+      height: 100%;
+      line-height: 1.76;
+      min-height: 620px;
+      overflow: auto;
+      padding: 42px clamp(22px, 5vw, 70px);
+    }
+    .local-page h2 { color: #1f3d35; margin-bottom: 8px; }
+    .page-number { color: #7b6d51; font-weight: 900; margin-bottom: 18px; }
+    .handwritten-sheet {
+      background:
+        linear-gradient(#fffdf7 31px, #e7efe9 32px),
+        #fffdf7;
+      background-size: 100% 32px;
+      border-left: 4px solid rgba(201, 168, 76, 0.72);
+      box-shadow: inset 0 0 0 1px rgba(201, 168, 76, 0.12);
+      color: #25342f;
+      font-family: 'Segoe Print', 'Comic Sans MS', cursive;
+      font-size: 1.06rem;
+      line-height: 2;
+      white-space: pre-wrap;
+    }
+
+    .collab-pane {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      min-height: calc(100vh - 142px);
+    }
+    .collab-header {
+      border-bottom: 1px solid #e5ede8;
+      padding: 14px;
+    }
+    .collab-tabs {
+      background: #f8faf8;
+      border-bottom: 1px solid #e5ede8;
+      display: grid;
+      gap: 6px;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 8px;
+    }
+    .tab-button {
+      background: transparent;
+      box-shadow: none;
+      color: #40564f;
+      min-height: 38px;
+      padding: 8px;
+    }
+    .tab-button.active {
+      background: var(--teal);
+      color: #fff;
+    }
+    .tab-panel {
+      display: none;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .tab-panel.active {
+      display: grid;
+      grid-template-rows: 1fr auto;
+    }
+
+    .chat-panel-shell {
+      background:
+        linear-gradient(rgba(248, 250, 248, 0.9), rgba(248, 250, 248, 0.9)),
+        radial-gradient(circle at 12px 12px, rgba(31, 107, 90, 0.08) 2px, transparent 2px);
+      background-size: auto, 28px 28px;
+      display: grid;
+      grid-template-rows: auto 1fr auto auto;
+      min-height: 0;
+    }
+    .chat-room-bar {
+      align-items: center;
+      background: #f0f6f3;
+      border-bottom: 1px solid #dfe9e4;
+      display: flex;
+      gap: 10px;
+      padding: 10px 12px;
+    }
+    .chat-avatar {
+      align-items: center;
+      background: linear-gradient(135deg, var(--teal), var(--gold));
+      border-radius: 999px;
+      color: #fff;
+      display: inline-flex;
+      font-size: 0.85rem;
+      font-weight: 900;
+      height: 38px;
+      justify-content: center;
+      width: 38px;
+    }
+    .chat-room-title {
+      display: grid;
+      flex: 1;
+      min-width: 0;
+    }
+    .chat-room-title strong {
+      color: #20342e;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .chat-room-title span {
+      color: #4f8978;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .chat-log {
+      align-content: end;
+      display: grid;
+      gap: 7px;
+      overflow: auto;
+      padding: 14px 12px;
+    }
+    .chat-message {
+      animation: messageIn 0.2s ease both;
+      display: grid;
+      justify-items: start;
+      max-width: 86%;
+    }
+    .chat-message.mine {
+      justify-self: end;
+      justify-items: end;
+    }
+    .chat-bubble {
+      background: #fff;
+      border: 1px solid #e0e8e4;
+      border-radius: 8px 8px 8px 2px;
+      box-shadow: 0 4px 12px rgba(23, 35, 31, 0.06);
+      color: #1f2f2b;
+      overflow-wrap: anywhere;
+      padding: 8px 9px 6px;
+      position: relative;
+    }
+    .chat-message.mine .chat-bubble {
+      background: #dcf8c6;
+      border-color: #c7ecad;
+      border-radius: 8px 8px 2px 8px;
+    }
+    .chat-author {
+      color: var(--teal);
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 900;
+      margin-bottom: 2px;
+    }
+    .chat-message.mine .chat-author { display: none; }
+    .chat-text {
+      display: block;
+      font-size: 0.94rem;
+      line-height: 1.4;
+      padding-right: 54px;
+      white-space: pre-wrap;
+    }
+    .chat-attachment {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 6px;
+      max-width: 240px;
+    }
+    .chat-attachment img {
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 8px;
+      display: block;
+      max-height: 180px;
+      max-width: 100%;
+      object-fit: cover;
+    }
+    .file-card {
+      align-items: center;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(31, 107, 90, 0.18);
+      border-radius: 8px;
+      color: #20342e;
+      display: grid;
+      gap: 3px;
+      grid-template-columns: auto 1fr;
+      min-width: 210px;
+      padding: 9px;
+    }
+    .file-icon {
+      align-items: center;
+      background: #eaf4f0;
+      border-radius: 8px;
+      color: var(--teal);
+      display: inline-flex;
+      font-size: 0.8rem;
+      font-weight: 900;
+      height: 34px;
+      justify-content: center;
+      width: 42px;
+    }
+    .file-card strong,
+    .file-card span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .file-card strong { font-size: 0.86rem; }
+    .file-card span { color: var(--muted); font-size: 0.75rem; }
+    .message-meta {
+      align-items: center;
+      bottom: 5px;
+      color: #77837f;
+      display: inline-flex;
+      font-size: 0.68rem;
+      gap: 3px;
+      position: absolute;
+      right: 8px;
+    }
+    .message-checks {
+      color: #3b82f6;
+      font-size: 0.72rem;
+      letter-spacing: -0.12em;
+    }
+    .emoji-row {
+      background: rgba(248, 250, 248, 0.96);
+      border-top: 1px solid #e5ede8;
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 8px 10px 0;
+    }
+    .emoji-chip {
+      background: #fff;
+      border: 1px solid #e1e9e4;
+      border-radius: 999px;
+      box-shadow: none;
+      color: #263a34;
+      min-height: 32px;
+      min-width: 38px;
+      padding: 5px 9px;
+    }
+    .emoji-chip:hover {
+      background: #eaf4f0;
+      box-shadow: none;
+    }
+    .chat-form {
+      background: rgba(248, 250, 248, 0.96);
+      display: grid;
+      gap: 8px;
+      grid-template-columns: auto 1fr auto;
+      padding: 10px;
+    }
+    .chat-form input,
+    .notes-area {
+      background: #fbfcfb;
+      border: 1px solid #cfdcd5;
+      border-radius: 8px;
+      color: #22322e;
+      outline: none;
+      padding: 11px 12px;
+      width: 100%;
+    }
+    .chat-form input {
+      background: #fff;
+      border-radius: 999px;
+      min-height: 42px;
+      padding: 10px 14px;
+    }
+    .chat-form button {
+      border-radius: 999px;
+      min-width: 48px;
+      padding: 9px 14px;
+    }
+    .attach-button {
+      background: #fff;
+      border: 1px solid #dce6e1;
+      border-radius: 999px;
+      box-shadow: none;
+      color: #27423a;
+      min-width: 44px;
+      padding: 9px 12px;
+    }
+    .attach-button:hover {
+      background: #eaf4f0;
+      box-shadow: none;
+    }
+    .selected-file {
+      background: rgba(255,255,255,0.96);
+      border-top: 1px solid #e5ede8;
+      color: var(--muted);
+      display: none;
+      font-size: 0.78rem;
+      padding: 0 12px 8px;
+    }
+    .selected-file.active {
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+    }
+    .chat-form input:focus,
+    .notes-area:focus {
+      background: #fff;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 4px rgba(31, 107, 90, 0.12);
+    }
+
+    .notes-panel {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      min-height: 0;
+    }
+    .notes-area {
+      border: 0;
+      border-radius: 0;
+      line-height: 1.6;
+      min-height: 420px;
+      resize: none;
+    }
+    .notes-footer,
+    .canvas-footer {
+      align-items: center;
+      border-top: 1px solid #e5ede8;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      font-size: 0.82rem;
+      gap: 8px;
+      justify-content: space-between;
+      padding: 10px 12px;
+    }
+
+    .canvas-panel {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 0;
+    }
+    .canvas-tools {
+      align-items: center;
+      background: #f8faf8;
+      border-bottom: 1px solid #e5ede8;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px;
+    }
+    .canvas-tools label {
+      align-items: center;
+      color: var(--muted);
+      display: inline-flex;
+      font-size: 0.82rem;
+      font-weight: 800;
+      gap: 6px;
+    }
+    .canvas-tools input[type="range"] { width: 82px; }
+    .canvas-wrap {
+      background: #fffdf7;
+      min-height: 420px;
+      overflow: hidden;
+      position: relative;
+    }
+    #drawCanvas {
+      cursor: crosshair;
+      display: block;
+      height: 100%;
+      width: 100%;
+    }
+
+    .loading {
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      color: var(--muted);
+      display: flex;
+      justify-content: center;
+      min-height: 50vh;
+      padding: 32px;
+    }
+    .hidden { display: none !important; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes messageIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 1060px) {
+      .room-grid { grid-template-columns: 1fr; }
+      .reader-pane { grid-column: auto; min-height: 620px; }
+      .collab-pane { min-height: 560px; }
+    }
+    @media (max-width: 640px) {
+      .room-shell { padding: 10px; }
+      .topbar { align-items: stretch; flex-direction: column; }
+      .top-actions { justify-content: stretch; }
+      .top-actions a, .top-actions button { flex: 1; }
+      .reader-toolbar { align-items: stretch; flex-direction: column; }
+      .page-tools { justify-content: flex-start; }
+      .chat-form { grid-template-columns: 1fr; }
+      .collab-tabs { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="room-shell">
+    <header class="topbar">
+      <div class="title-block">
+        <span class="eyebrow">Group reading room</span>
+        <h1 id="roomTitle">Loading room...</h1>
+        <div id="roomMeta" class="meta">Preparing shared workspace</div>
+      </div>
+      <div class="top-actions">
+        <a class="top-link secondary" href="/groups">Back to Groups</a>
+        <a class="top-link secondary" href="/books">Books</a>
+      </div>
+    </header>
+
+    <div id="loading" class="loading">Loading reading room...</div>
+
+    <section id="roomGrid" class="room-grid hidden">
+      <div class="reader-pane">
+        <div class="reader-toolbar">
+          <div class="title-block">
+            <span class="eyebrow">Shared book page</span>
+            <h2 id="bookTitle">Book</h2>
+            <div id="bookMeta" class="meta">Author</div>
+          </div>
+          <div class="page-tools">
+            <button id="prevPage" class="secondary" type="button">Previous</button>
+            <span id="pageBadge" class="badge">Page 1 / 1</span>
+            <button id="nextPage" class="secondary" type="button">Next</button>
+            <form id="pageJumpForm" class="page-jump">
+              <input id="pageInput" type="number" min="1" value="1" aria-label="Page number">
+              <button class="secondary" type="submit">Go</button>
+            </form>
+          </div>
+        </div>
+        <div id="progressTrack" class="progress-track" style="--progress: 0%"><span></span></div>
+        <div id="bookSurface"></div>
+      </div>
+
+      <aside class="collab-pane">
+        <div class="collab-header">
+          <span class="eyebrow">Collaboration tools</span>
+          <h2>Discuss, note, draw</h2>
+          <div class="meta">Chat live, keep simple notes, or sketch an explanation.</div>
+        </div>
+        <nav class="collab-tabs" aria-label="Collaboration tabs">
+          <button class="tab-button active" type="button" data-tab="chatPanel">Chat</button>
+          <button class="tab-button" type="button" data-tab="notesPanel">Notepad</button>
+          <button class="tab-button" type="button" data-tab="canvasPanel">Canvas</button>
+        </nav>
+
+        <section id="chatPanel" class="tab-panel active">
+          <div class="chat-panel-shell">
+            <div class="chat-room-bar">
+              <span id="chatAvatar" class="chat-avatar">R</span>
+              <div class="chat-room-title">
+                <strong id="chatRoomName">Reading group</strong>
+                <span>Live now</span>
+              </div>
+            </div>
+            <div id="chatLog" class="chat-log">
+              <p class="meta">Loading chat...</p>
+            </div>
+            <div class="emoji-row" aria-label="Quick emoji reactions">
+              <button class="emoji-chip" type="button" data-emoji="👍">👍</button>
+              <button class="emoji-chip" type="button" data-emoji="❤️">❤️</button>
+              <button class="emoji-chip" type="button" data-emoji="😂">😂</button>
+              <button class="emoji-chip" type="button" data-emoji="🔥">🔥</button>
+              <button class="emoji-chip" type="button" data-emoji="✅">✅</button>
+            </div>
+            <form id="chatForm" class="chat-form">
+              <button id="attachButton" class="attach-button" type="button">Attach</button>
+              <input id="chatAttachment" type="file" accept="image/*,.pdf,.txt,.md" hidden>
+              <input id="chatInput" type="text" placeholder="Type a message">
+              <button type="submit">Send</button>
+            </form>
+            <div id="selectedFile" class="selected-file"></div>
+          </div>
+        </section>
+
+        <section id="notesPanel" class="tab-panel">
+          <div class="notes-panel">
+            <textarea id="notesArea" class="notes-area" placeholder="Write explanation notes, questions, or key points for this session."></textarea>
+            <div class="notes-footer">
+              <span id="notesStatus">Notes save automatically</span>
+              <button id="clearNotes" class="secondary" type="button">Clear Notes</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="canvasPanel" class="tab-panel">
+          <div class="canvas-panel">
+            <div class="canvas-tools">
+              <label>Color <input id="penColor" type="color" value="#1f6b5a"></label>
+              <label>Size <input id="penSize" type="range" min="2" max="18" value="5"></label>
+              <button id="clearCanvas" class="secondary" type="button">Clear Canvas</button>
+            </div>
+            <div class="canvas-wrap">
+              <canvas id="drawCanvas"></canvas>
+            </div>
+            <div class="canvas-footer">
+              <span>Use the canvas for diagrams, formulas, timelines, or quick explanations.</span>
+              <span id="canvasStatus">Drawing is saved locally</span>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/alerts.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const groupId = Number(params.get('group'));
+    const sessionId = Number(params.get('session'));
+    let groupData = null;
+    let activeSession = null;
+    let liveSocket = null;
+    let isDrawing = false;
+    let canvasReady = false;
+
+    function authHeaders(user) {
+      return {
+        'Authorization': 'Bearer ' + user.token,
+        'Content-Type': 'application/json'
+      };
+    }
+
+    function formatDateTime(value) {
+      if (!value) return 'Time not set';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return date.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+    }
+
+    function formatMessageTime(value) {
+      if (!value) return '';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '';
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function attachmentLabel(type) {
+      if (type === 'image') return 'IMG';
+      if (type === 'pdf') return 'PDF';
+      if (type === 'note') return 'NOTE';
+      return 'FILE';
+    }
+
+    function renderAttachment(message) {
+      if (!message.attachment_url) return '';
+      const name = Utils.escapeHtml(message.attachment_name || 'Attachment');
+      const url = Utils.escapeHtml(message.attachment_url);
+      const type = message.attachment_type || 'file';
+      if (type === 'image') {
+        return `
+          <a class="chat-attachment" href="${url}" target="_blank" rel="noopener">
+            <img src="${url}" alt="${name}">
+          </a>`;
+      }
+      return `
+        <a class="chat-attachment file-card" href="${url}" target="_blank" rel="noopener" download>
+          <span class="file-icon">${Utils.escapeHtml(attachmentLabel(type))}</span>
+          <span>
+            <strong>${name}</strong>
+            <span>${type === 'pdf' ? 'PDF explanation file' : type === 'note' ? 'Notes file' : 'Attachment'}</span>
+          </span>
+        </a>`;
+    }
+
+    function withPageInUrl(url, page) {
+      if (!url) return '';
+      if (url.includes('#')) return url.replace(/#.*$/, `#page=${page}`);
+      return `${url}#page=${page}`;
+    }
+
+    function storageKey(type) {
+      return `reading-room:${type}:${groupId}:${sessionId}`;
+    }
+
+    function updateRoomView() {
+      const book = activeSession.book || {};
+      const page = activeSession.current_page || 1;
+      const total = activeSession.total_pages || 1;
+      const progress = Math.max(4, Math.min(100, Math.round((page / total) * 100)));
+
+      document.getElementById('roomTitle').textContent = activeSession.title || 'Reading Session';
+      document.getElementById('roomMeta').textContent = `${groupData.name || 'Reading group'} - ${formatDateTime(activeSession.scheduled_at)}`;
+      document.getElementById('chatRoomName').textContent = groupData.name || 'Reading group';
+      document.getElementById('chatAvatar').textContent = (groupData.name || 'R').charAt(0).toUpperCase();
+      document.getElementById('bookTitle').textContent = activeSession.source_title || activeSession.book_title || book.title || 'Selected Book';
+      document.getElementById('bookMeta').textContent = activeSession.source_type === 'member_notes'
+        ? 'Member handwritten notes'
+        : `by ${book.author || 'Unknown author'}`;
+      document.getElementById('pageBadge').textContent = `Page ${page} / ${total}`;
+      document.getElementById('pageInput').value = page;
+      document.getElementById('pageInput').max = total;
+      document.getElementById('progressTrack').style.setProperty('--progress', `${progress}%`);
+      document.getElementById('prevPage').disabled = page <= 1;
+      document.getElementById('nextPage').disabled = page >= total;
+      document.getElementById('chatInput').placeholder = `Discuss page ${page}`;
+
+      renderBookSurface();
+    }
+
+    function renderBookSurface() {
+      const book = activeSession.book || {};
+      const page = activeSession.current_page || 1;
+      const total = activeSession.total_pages || 1;
+      const surface = document.getElementById('bookSurface');
+
+      if (activeSession.source_type === 'member_notes') {
+        const title = activeSession.source_title || activeSession.book_title || activeSession.title || 'Member Notes';
+        const content = activeSession.source_content || 'No notes content was added for this session.';
+        surface.innerHTML = `
+          <div class="local-page handwritten-sheet">
+            <div class="page-number">Member notes - page ${page} of ${total}</div>
+            <h2>${Utils.escapeHtml(title)}</h2>
+            <p>${Utils.escapeHtml(content)}</p>
+          </div>`;
+        return;
+      }
+
+      if (book.read_url) {
+        surface.innerHTML = `<iframe class="book-frame" title="Book page" src="${Utils.escapeHtml(withPageInUrl(book.read_url, page))}"></iframe>`;
+        return;
+      }
+
+      const genres = book.genres ? `Genre: ${book.genres}.` : '';
+      const description = book.description || 'This book does not have readable page content attached yet. Use this shared page view to keep discussion aligned.';
+      surface.innerHTML = `
+        <div class="local-page">
+          <div class="page-number">Page ${page} of ${total}</div>
+          <h2>${Utils.escapeHtml(book.title || activeSession.book_title || 'Selected Book')}</h2>
+          <p><strong>${Utils.escapeHtml(book.author || 'Unknown author')}</strong></p>
+          <p>${Utils.escapeHtml(genres)}</p>
+          <p>${Utils.escapeHtml(description)}</p>
+          <p>This page is synchronized with the group. Use chat for discussion, the notepad for summary points, and the canvas for quick explanations.</p>
+        </div>`;
+    }
+
+    async function loadRoom() {
+      const user = Utils.requireAuth();
+      if (!user) return;
+      if (!groupId || !sessionId) {
+        document.getElementById('loading').textContent = 'Missing group or session id.';
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/groups/${groupId}`, {
+          headers: { 'Authorization': 'Bearer ' + user.token }
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          document.getElementById('loading').textContent = result.message || 'Unable to load room.';
+          return;
+        }
+
+        groupData = result;
+        activeSession = (result.sessions || []).find(session => Number(session.id) === sessionId);
+        if (!activeSession) {
+          document.getElementById('loading').textContent = 'Reading session not found.';
+          return;
+        }
+
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('roomGrid').classList.remove('hidden');
+        updateRoomView();
+        initLiveSocket();
+        loadChat();
+        initNotes();
+        initCanvas();
+      } catch (error) {
+        console.error('Room load error:', error);
+        document.getElementById('loading').textContent = 'Network error while loading room.';
+      }
+    }
+
+    function initLiveSocket() {
+      const user = Utils.getCurrentUser();
+      if (!user || typeof io === 'undefined') return;
+
+      liveSocket = io({
+        transports: ['websocket', 'polling'],
+        auth: { token: user.token }
+      });
+
+      liveSocket.on('connect', () => {
+        liveSocket.emit('join_group_room', { group_id: groupId, token: user.token });
+      });
+
+      liveSocket.on('room_error', payload => {
+        if (payload && payload.message) Alerts.error(payload.message);
+      });
+
+      liveSocket.on('group_message', appendChatMessage);
+
+      liveSocket.on('group_page_updated', payload => {
+        if (Number(payload.group_id) !== groupId || Number(payload.session_id) !== sessionId) return;
+        activeSession.current_page = payload.current_page;
+        activeSession.total_pages = payload.total_pages;
+        updateRoomView();
+      });
+    }
+
+    async function updatePage(page) {
+      const user = Utils.requireAuth();
+      if (!user) return;
+
+      if (liveSocket && liveSocket.connected) {
+        liveSocket.emit('update_group_page', {
+          group_id: groupId,
+          session_id: sessionId,
+          page,
+          token: user.token
+        });
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/groups/${groupId}/sessions/${sessionId}/page`, {
+          method: 'PUT',
+          headers: authHeaders(user),
+          body: JSON.stringify({ page })
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          Alerts.error(result.message || 'Unable to update page.');
+          return;
+        }
+        activeSession = result.session;
+        updateRoomView();
+      } catch (error) {
+        console.error('Page update error:', error);
+        Alerts.error('Network error while updating the page.');
+      }
+    }
+
+    async function loadChat() {
+      const user = Utils.requireAuth();
+      if (!user) return;
+      const chatLog = document.getElementById('chatLog');
+
+      try {
+        const response = await fetch(`/api/groups/${groupId}/chat`, {
+          headers: { 'Authorization': 'Bearer ' + user.token }
+        });
+        const messages = await response.json();
+        if (!response.ok) {
+          chatLog.innerHTML = `<p class="meta">${Utils.escapeHtml(messages.message || 'Unable to load chat.')}</p>`;
+          return;
+        }
+        chatLog.innerHTML = messages.length ? '' : '<p class="meta">No messages yet.</p>';
+        messages.forEach(appendChatMessage);
+      } catch (error) {
+        console.error('Load chat error:', error);
+        chatLog.innerHTML = '<p class="meta">Unable to load chat.</p>';
+      }
+    }
+
+    function appendChatMessage(message) {
+      if (Number(message.group_id) !== groupId) return;
+      const chatLog = document.getElementById('chatLog');
+      const user = Utils.getCurrentUser();
+      if (!chatLog || !user) return;
+      const emptyText = chatLog.querySelector('.meta');
+      if (emptyText) emptyText.remove();
+
+      const item = document.createElement('div');
+      item.className = `chat-message ${Number(message.user_id) === Number(user.id) ? 'mine' : ''}`;
+      item.innerHTML = `
+        <div class="chat-bubble">
+          <span class="chat-author">${Utils.escapeHtml(message.author_name || 'Reader')}</span>
+          ${renderAttachment(message)}
+          <span class="chat-text">${Utils.escapeHtml(message.message || '')}</span>
+          <span class="message-meta">
+            ${Utils.escapeHtml(formatMessageTime(message.created_at))}
+            ${Number(message.user_id) === Number(user.id) ? '<span class="message-checks">✓✓</span>' : ''}
+          </span>
+        </div>
+      `;
+      chatLog.appendChild(item);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    async function sendChat(message) {
+      const user = Utils.requireAuth();
+      if (!user || !message) return;
+
+      if (liveSocket && liveSocket.connected) {
+        liveSocket.emit('send_group_message', {
+          group_id: groupId,
+          message,
+          token: user.token
+        });
+        return;
+      }
+
+      const response = await fetch(`/api/groups/${groupId}/chat`, {
+        method: 'POST',
+        headers: authHeaders(user),
+        body: JSON.stringify({ message })
+      });
+      const result = await response.json();
+      if (response.ok) appendChatMessage(result.chat);
+      else Alerts.error(result.message || 'Unable to send message.');
+    }
+
+    async function uploadChatAttachment(message, file) {
+      const user = Utils.requireAuth();
+      if (!user || !file) return;
+      const formData = new FormData();
+      formData.append('message', message);
+      formData.append('attachment', file);
+
+      const response = await fetch(`/api/groups/${groupId}/chat/upload`, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + user.token },
+        body: formData
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        Alerts.error(result.message || 'Unable to upload attachment.');
+        return;
+      }
+      if (!liveSocket || !liveSocket.connected) appendChatMessage(result.chat);
+    }
+
+    function initNotes() {
+      const notesArea = document.getElementById('notesArea');
+      const status = document.getElementById('notesStatus');
+      notesArea.value = localStorage.getItem(storageKey('notes')) || '';
+      notesArea.addEventListener('input', Utils.debounce(() => {
+        localStorage.setItem(storageKey('notes'), notesArea.value);
+        status.textContent = 'Saved just now';
+      }, 250));
+      document.getElementById('clearNotes').addEventListener('click', () => {
+        notesArea.value = '';
+        localStorage.removeItem(storageKey('notes'));
+        status.textContent = 'Notes cleared';
+      });
+    }
+
+    function initCanvas() {
+      if (canvasReady) return;
+      canvasReady = true;
+      const canvas = document.getElementById('drawCanvas');
+      const wrap = canvas.parentElement;
+      const ctx = canvas.getContext('2d');
+
+      function resizeCanvas() {
+        const saved = canvas.toDataURL();
+        const rect = wrap.getBoundingClientRect();
+        const ratio = window.devicePixelRatio || 1;
+        canvas.width = Math.max(1, Math.floor(rect.width * ratio));
+        canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.fillStyle = '#fffdf7';
+        ctx.fillRect(0, 0, rect.width, rect.height);
+        restoreCanvas(saved);
+      }
+
+      function restoreCanvas(dataUrl) {
+        const stored = localStorage.getItem(storageKey('canvas')) || dataUrl;
+        if (!stored || stored === 'data:,') return;
+        const image = new Image();
+        image.onload = () => ctx.drawImage(image, 0, 0, canvas.clientWidth, canvas.clientHeight);
+        image.src = stored;
+      }
+
+      function point(event) {
+        const rect = canvas.getBoundingClientRect();
+        const source = event.touches ? event.touches[0] : event;
+        return { x: source.clientX - rect.left, y: source.clientY - rect.top };
+      }
+
+      function start(event) {
+        event.preventDefault();
+        isDrawing = true;
+        const p = point(event);
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+      }
+
+      function draw(event) {
+        if (!isDrawing) return;
+        event.preventDefault();
+        const p = point(event);
+        ctx.strokeStyle = document.getElementById('penColor').value;
+        ctx.lineWidth = Number(document.getElementById('penSize').value);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+      }
+
+      function stop() {
+        if (!isDrawing) return;
+        isDrawing = false;
+        localStorage.setItem(storageKey('canvas'), canvas.toDataURL());
+        document.getElementById('canvasStatus').textContent = 'Drawing saved';
+      }
+
+      canvas.addEventListener('mousedown', start);
+      canvas.addEventListener('mousemove', draw);
+      window.addEventListener('mouseup', stop);
+      canvas.addEventListener('touchstart', start, { passive: false });
+      canvas.addEventListener('touchmove', draw, { passive: false });
+      window.addEventListener('touchend', stop);
+      window.addEventListener('resize', Utils.debounce(resizeCanvas, 200));
+
+      document.getElementById('clearCanvas').addEventListener('click', () => {
+        ctx.fillStyle = '#fffdf7';
+        ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+        localStorage.removeItem(storageKey('canvas'));
+        document.getElementById('canvasStatus').textContent = 'Canvas cleared';
+      });
+
+      requestAnimationFrame(resizeCanvas);
+    }
+
+    document.querySelectorAll('.tab-button').forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.tab-button').forEach(item => item.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+        button.classList.add('active');
+        document.getElementById(button.dataset.tab).classList.add('active');
+        if (button.dataset.tab === 'canvasPanel') {
+          requestAnimationFrame(() => {
+            const event = new Event('resize');
+            window.dispatchEvent(event);
+          });
+        }
+      });
+    });
+
+    document.getElementById('prevPage').addEventListener('click', () => updatePage((activeSession.current_page || 1) - 1));
+    document.getElementById('nextPage').addEventListener('click', () => updatePage((activeSession.current_page || 1) + 1));
+    document.getElementById('pageJumpForm').addEventListener('submit', event => {
+      event.preventDefault();
+      updatePage(Number(document.getElementById('pageInput').value));
+    });
+    document.getElementById('chatForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const input = document.getElementById('chatInput');
+      const attachmentInput = document.getElementById('chatAttachment');
+      const message = input.value.trim();
+      const file = attachmentInput.files[0];
+      if (!message && !file) return;
+      input.value = '';
+      if (file) {
+        await uploadChatAttachment(message, file);
+        attachmentInput.value = '';
+        updateSelectedFile();
+      } else {
+        await sendChat(message);
+      }
+    });
+    function updateSelectedFile() {
+      const attachmentInput = document.getElementById('chatAttachment');
+      const selectedFile = document.getElementById('selectedFile');
+      const file = attachmentInput.files[0];
+      if (!file) {
+        selectedFile.classList.remove('active');
+        selectedFile.innerHTML = '';
+        return;
+      }
+      selectedFile.classList.add('active');
+      selectedFile.innerHTML = `
+        <span>${Utils.escapeHtml(file.name)}</span>
+        <button class="secondary" type="button" onclick="clearSelectedAttachment()">Remove</button>
+      `;
+    }
+    function clearSelectedAttachment() {
+      document.getElementById('chatAttachment').value = '';
+      updateSelectedFile();
+    }
+    document.getElementById('attachButton').addEventListener('click', () => {
+      document.getElementById('chatAttachment').click();
+    });
+    document.getElementById('chatAttachment').addEventListener('change', updateSelectedFile);
+    document.querySelectorAll('.emoji-chip').forEach(button => {
+      button.addEventListener('click', () => {
+        const input = document.getElementById('chatInput');
+        input.value = `${input.value}${input.value ? ' ' : ''}${button.dataset.emoji}`;
+        input.focus();
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', loadRoom);
+  </script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Register for Book Reading Community Platform">
+  <title>Register - Book Reading Community</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-brand animate-fade-up">
+      <div class="brand-content">
+        <div class="brand-logo">&#127891;</div>
+        <h1>Join The Community</h1>
+        <h2>Create your reading account</h2>
+        <ul class="brand-features">
+          <li>Save your reading progress</li>
+          <li>Join book groups</li>
+          <li>Publish reviews</li>
+          <li>Build a reading habit</li>
+          <li>Access API-backed features</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="auth-form-panel animate-fade-up" style="animation-delay:0.15s;">
+      <div class="form-header">
+        <h2>Create Account</h2>
+        <p>Fill in your details to register as a reader</p>
+      </div>
+
+      <form class="auth-form" id="registerForm">
+        <div class="form-group">
+          <label for="regName">Full Name</label>
+          <input type="text" id="regName" class="form-control" placeholder="Enter your full name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="regRegNo">Username</label>
+          <input type="text" id="regRegNo" class="form-control" placeholder="Choose a username" required>
+        </div>
+
+        <div class="form-group">
+          <label for="regEmail">Email Address</label>
+          <input type="email" id="regEmail" class="form-control" placeholder="your.email@example.com" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="regPassword">Password</label>
+            <div class="password-field">
+              <input type="password" id="regPassword" class="form-control" placeholder="Min 6 characters" required minlength="6">
+              <button type="button" class="toggle-pass" onclick="togglePasswordVisibility('regPassword', this)">Show</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="regConfirmPassword">Confirm Password</label>
+            <div class="password-field">
+              <input type="password" id="regConfirmPassword" class="form-control" placeholder="Re-enter password" required minlength="6">
+              <button type="button" class="toggle-pass" onclick="togglePasswordVisibility('regConfirmPassword', this)">Show</button>
+            </div>
+          </div>
+        </div>
+
+        <input type="hidden" id="regDepartment" value="Readers">
+        <input type="hidden" id="regPhone" value="">
+
+        <button type="submit" class="btn btn-primary btn-block" style="padding:13px;font-size:1rem;">Create Account</button>
+
+        <div class="form-footer">
+          <p>Already have an account? <a href="{{ url_for('login_page') }}">Sign In</a></p>
+          <p style="margin-top:0.5rem;"><a href="{{ url_for('home') }}" style="font-weight:400;">Back to Home</a></p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    window.BOOK_PLATFORM_ROUTES = {
+      home: "{{ url_for('home') }}",
+      login: "{{ url_for('login_page') }}",
+      register: "{{ url_for('register_page') }}",
+      dashboard: "{{ url_for('dashboard_page') }}"
+    };
+  </script>
+  <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/alerts.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+  <script>
+    const user = Utils.getCurrentUser();
+    if (user) window.location.href = window.BOOK_PLATFORM_ROUTES.dashboard;
+    Utils.loadDarkMode();
+    initRegisterPage();
+  </script>
+</body>
+</html>

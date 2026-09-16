@@ -1,0 +1,14 @@
+Flask
+Flask-SocketIO
+Flask-SQLAlchemy
+PyJWT
+Werkzeug
+Authlib
+flasgger
+flask-smorest
+marshmallow
+gunicorn
+psycopg2-binary
+requests
+razorpay
+google-generativeai

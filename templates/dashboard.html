@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Book Reading Community Dashboard">
+  <title>Dashboard - Book Reading Community</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+  <div class="dashboard-layout">
+    <button class="menu-toggle" id="menuToggle">Menu</button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main-content" id="mainContent">
+      <div class="page-header animate-fade-up">
+        <div class="welcome">
+          <h1 id="welcomeMsg">Welcome</h1>
+          <p id="welcomeSub">Reading dashboard</p>
+        </div>
+        <div class="header-actions">
+          <a class="btn btn-secondary" href="/apidocs">API Docs</a>
+          <button class="dark-mode-toggle" id="darkModeToggle" title="Toggle Dark Mode">Dark</button>
+        </div>
+      </div>
+
+      <div id="studentDashboard">
+        <div class="stats-grid">
+          <div class="stat-card blue animate-fade-up">
+            <div class="stat-icon">&#128218;</div>
+            <div class="stat-info">
+              <h3 id="statBorrowed">0</h3>
+              <p>Active Reads</p>
+            </div>
+          </div>
+          <div class="stat-card gold animate-fade-up" style="animation-delay:0.1s">
+            <div class="stat-icon">&#9200;</div>
+            <div class="stat-info">
+              <h3 id="statDueSoon">0</h3>
+              <p>Due Soon</p>
+            </div>
+          </div>
+          <div class="stat-card red animate-fade-up" style="animation-delay:0.2s">
+            <div class="stat-icon">&#9888;</div>
+            <div class="stat-info">
+              <h3 id="statOverdue">0</h3>
+              <p>Overdue</p>
+            </div>
+          </div>
+          <div class="stat-card purple animate-fade-up" style="animation-delay:0.3s">
+            <div class="stat-icon">&#128172;</div>
+            <div class="stat-info">
+              <h3 id="statFine">0</h3>
+              <p>Review Notes</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid animate-fade-up" style="animation-delay:0.1s;">
+          <div class="card animate-fade-up" style="animation-delay:0.15s;">
+            <h3 class="section-title">Recent Activity</h3>
+            <div class="recent-list" id="recentActivity"></div>
+          </div>
+
+          <div>
+            <div class="card animate-fade-up" style="animation-delay:0.2s;">
+              <h4 style="margin-bottom:0.75rem;">Quick Actions</h4>
+              <div class="quick-actions">
+                <a href="/api/books" class="quick-action-btn">
+                  <span class="action-icon">&#128214;</span>Books API
+                </a>
+                <a href="/api/reviews" class="quick-action-btn">
+                  <span class="action-icon">&#11088;</span>Reviews
+                </a>
+                <a href="/api/groups" class="quick-action-btn">
+                  <span class="action-icon">&#128101;</span>Groups
+                </a>
+                <a href="/api/progress" class="quick-action-btn">
+                  <span class="action-icon">&#128200;</span>Progress
+                </a>
+              </div>
+            </div>
+            <div class="card mt-2">
+              <h4>Platform Status</h4>
+              <p style="font-size:1.2rem;font-weight:800;color:var(--accent);margin-top:0.5rem;">Frontend connected</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="footer" style="margin-top:2rem;margin-left:-2rem;margin-right:-2rem;margin-bottom:-2rem;">
+        <div class="footer-bottom">
+          <p>&copy; 2026 Book Reading Community Platform</p>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    window.BOOK_PLATFORM_ROUTES = {
+      home: "{{ url_for('home') }}",
+      login: "{{ url_for('login_page') }}",
+      register: "{{ url_for('register_page') }}",
+      dashboard: "{{ url_for('dashboard_page') }}"
+    };
+  </script>
+  <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+  <script src="{{ url_for('static', filename='data/booksData.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/alerts.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/borrows.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+  <script>
+    Dashboard.init();
+    const user = Dashboard.currentUser;
+    if (user) {
+      document.getElementById('welcomeMsg').textContent = `Welcome, ${user.name || user.username || 'Reader'}`;
+      document.getElementById('welcomeSub').textContent = 'Book Reading Community Dashboard';
+      Dashboard.renderStudentDashboard();
+    }
+  </script>
+</body>
+</html>

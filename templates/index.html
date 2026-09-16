@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Book Reading Community Platform - Discover, review, track, and discuss books online.">
+  <title>Book Reading Community</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .landing-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 3rem;
+      background: rgba(10, 22, 40, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .landing-nav .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      min-width: 0;
+    }
+    .landing-nav .nav-brand span { font-size: 1.75rem; }
+    .landing-nav .nav-brand h2 {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      color: var(--accent);
+      overflow-wrap: anywhere;
+    }
+    .landing-nav .nav-links { display: flex; gap: 8px; }
+    .landing-nav .btn-login {
+      background: #ffffff;
+      border: 1.5px solid rgba(255,255,255,0.9);
+      color: #0a1628;
+      font-weight: 800;
+      box-shadow: 0 8px 22px rgba(255,255,255,0.12);
+    }
+    .landing-nav .btn-login:hover {
+      background: #e9eef5;
+      border-color: #fff;
+      color: #0a1628;
+      box-shadow: 0 12px 28px rgba(255,255,255,0.18);
+    }
+    .hero {
+      min-height: 92vh;
+      background: linear-gradient(160deg, #0a1628 0%, #132238 44%, #213a5e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #fff;
+      padding: 6rem 2rem 3rem;
+    }
+    .hero-content { max-width: 760px; }
+    .hero-icon { font-size: 5rem; margin-bottom: 1.5rem; animation: pulse 3s ease-in-out infinite; }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      line-height: 1.15;
+      margin-bottom: 0.5rem;
+    }
+    .hero h1 .gold { color: var(--accent); }
+    .hero .hero-sub {
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.74);
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+    }
+    .hero .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .hero .btn-hero-primary,
+    .hero .btn-hero-secondary {
+      padding: 14px 36px;
+      font-size: 1rem;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      transition: var(--transition);
+    }
+    .hero .btn-hero-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: var(--primary);
+      border: none;
+      box-shadow: var(--shadow-gold);
+    }
+    .hero .btn-hero-secondary {
+      background: transparent;
+      color: #fff;
+      border: 1.5px solid rgba(255,255,255,0.3);
+    }
+    .hero .btn-hero-primary:hover,
+    .hero .btn-hero-secondary:hover { transform: translateY(-2px); }
+    .features { padding: 5rem 3rem; background: var(--bg); }
+    .features .section-header { text-align: center; margin-bottom: 3rem; }
+    .features .section-header h2 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .features .section-header p { color: var(--text-secondary); }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .feature-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      border: 1px solid var(--border);
+      text-align: center;
+      transition: var(--transition);
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--accent);
+    }
+    .feature-card .feature-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .feature-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .feature-card p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; }
+    .stats-banner { background: var(--primary); padding: 3rem; color: #fff; }
+    .stats-banner .stats-row { display: flex; justify-content: center; gap: 4rem; flex-wrap: wrap; }
+    .stats-banner .stat { text-align: center; }
+    .stats-banner .stat h3 { font-size: 2.5rem; font-weight: 800; color: var(--accent); }
+    .stats-banner .stat p {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    @media (max-width: 768px) {
+      .landing-nav {
+        gap: 10px;
+        padding: 0.75rem 1rem;
+      }
+      .landing-nav .nav-brand h2 { font-size: 1rem; }
+      .landing-nav .nav-links {
+        flex-shrink: 0;
+        gap: 6px;
+      }
+      .landing-nav .btn { padding: 8px 12px; }
+      .hero { overflow-x: hidden; }
+      .hero h1 {
+        font-size: 2rem;
+        overflow-wrap: anywhere;
+      }
+      .hero .hero-sub { font-size: 1rem; }
+      .hero .hero-actions {
+        align-items: stretch;
+        flex-direction: column;
+        margin: 0 auto;
+        max-width: 260px;
+      }
+      .hero .btn-hero-primary,
+      .hero .btn-hero-secondary {
+        width: 100%;
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+      .features { padding: 3rem 1.5rem; }
+      .stats-banner .stats-row { gap: 2rem; }
+      .stats-banner .stat h3 { font-size: 1.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="landing-nav">
+    <div class="nav-brand">
+      <span>&#128218;</span>
+      <h2>Book Reading Community</h2>
+    </div>
+    <div class="nav-links">
+      <a href="{{ url_for('login_page') }}" class="btn btn-login">Login</a>
+      <a href="{{ url_for('register_page') }}" class="btn btn-primary">Register</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-content animate-fade-up">
+      <div class="hero-icon">&#128214;</div>
+      <h1><span class="gold">Book Reading</span><br>Community Platform</h1>
+      <p class="hero-sub">
+        Discover books, write reviews, join reading groups, track progress, and keep your reading life organized in one polished workspace.
+      </p>
+      <div class="hero-actions">
+        <a href="{{ url_for('register_page') }}" class="btn-hero-primary">Get Started</a>
+        <a href="{{ url_for('login_page') }}" class="btn-hero-secondary">Member Login</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="features animate-fade-up">
+    <div class="section-header animate-fade-up" style="animation-delay:0.1s;">
+      <h2>Built For <span style="color:var(--accent)">Readers</span></h2>
+      <p>A modern reading dashboard inspired by the Vignan Library frontend.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card animate-fade-up">
+        <div class="feature-icon">&#128269;</div>
+        <h3>Book Discovery</h3>
+        <p>Search and explore books through the platform API and keep promising reads close at hand.</p>
+      </div>
+      <div class="feature-card animate-fade-up" style="animation-delay:0.1s">
+        <div class="feature-icon">&#11088;</div>
+        <h3>Reviews</h3>
+        <p>Publish thoughtful reviews and learn from what other readers are saying.</p>
+      </div>
+      <div class="feature-card animate-fade-up" style="animation-delay:0.2s">
+        <div class="feature-icon">&#128101;</div>
+        <h3>Reading Groups</h3>
+        <p>Create groups for shared goals, book clubs, and ongoing conversations.</p>
+      </div>
+      <div class="feature-card animate-fade-up" style="animation-delay:0.3s">
+        <div class="feature-icon">&#128200;</div>
+        <h3>Progress Tracking</h3>
+        <p>Track your reading progress and turn long books into manageable milestones.</p>
+      </div>
+      <div class="feature-card animate-fade-up" style="animation-delay:0.4s">
+        <div class="feature-icon">&#128172;</div>
+        <h3>AI Assistance</h3>
+        <p>Use AI routes for summaries, recommendations, and book-focused assistance.</p>
+      </div>
+      <div class="feature-card animate-fade-up" style="animation-delay:0.5s">
+        <div class="feature-icon">&#127769;</div>
+        <h3>Dark Mode</h3>
+        <p>Switch to a calmer theme when reading or reviewing later in the day.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats-banner">
+    <div class="stats-row">
+      <div class="stat">
+        <h3>API</h3>
+        <p>Ready</p>
+      </div>
+      <div class="stat">
+        <h3>Groups</h3>
+        <p>Supported</p>
+      </div>
+      <div class="stat">
+        <h3>Reviews</h3>
+        <p>Built In</p>
+      </div>
+      <div class="stat">
+        <h3>24/7</h3>
+        <p>Reading Access</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h3>&#128218; Book Reading Community</h3>
+        <p>A Flask-powered platform for book discovery, reviews, reading groups, progress tracking, payments, and AI reading support.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="{{ url_for('login_page') }}">Login</a></li>
+          <li><a href="{{ url_for('register_page') }}">Register</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Developer</h4>
+        <ul>
+          <li><a href="/apidocs">Swagger Docs</a></li>
+          <li><a href="/openapi.json">OpenAPI JSON</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Book Reading Community Platform. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+  <script src="{{ url_for('static', filename='data/booksData.js') }}"></script>
+</body>
+</html>
